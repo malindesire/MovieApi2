@@ -7,5 +7,6 @@
         public int Year { get; set; }
         public string Genre { get; set; } = null!;
         public int Duration { get; set; } // Duration in minutes
+        public MovieDetails MovieDetails { get; set; } = null!;
     }
 }
