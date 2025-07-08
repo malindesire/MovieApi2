@@ -9,10 +9,10 @@ namespace MovieApi.Data
         private static Faker faker = new Faker("sv");
         internal static async Task InitAsync(MovieContext context)
         {
-            if (await context.Movie.AnyAsync()) return;
+            if (await context.Movies.AnyAsync()) return;
 
             IEnumerable<Movie> movies = GetMovies(30);
-            await context.Movie.AddRangeAsync(movies);
+            await context.Movies.AddRangeAsync(movies);
 
             await context.SaveChangesAsync();
         }
