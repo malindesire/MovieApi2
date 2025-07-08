@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApi.Data;
+using MovieApi.Models.DTOs;
 using MovieApi.Models.Entities;
 
 namespace MovieApi.Controllers
@@ -23,9 +24,22 @@ namespace MovieApi.Controllers
 
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetMovie()
+        public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie()
         {
-            return await _context.Movie.ToListAsync();
+           var movies = _context.Movie.Select((m) => new MovieDto 
+           {
+                Id = m.Id,
+                Title = m.Title,
+                Year = m.Year,
+                Genre = m.Genre,
+                Duration = m.Duration,
+                Language = m.MovieDetails.Language,
+                Budget = m.MovieDetails.Budget,
+                AverageRating = m.Reviews.Any() ? m.Reviews.Average(r => r.Rating) : 0.0,
+                Actors = m.Actors.Select(a => a.FullName).ToArray()
+           });
+
+           return Ok(await movies.ToListAsync());
         }
 
         // GET: api/Movies/5
