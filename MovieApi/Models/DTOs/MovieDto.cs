@@ -10,6 +10,5 @@
         public required string Language { get; init; }
         public required decimal Budget { get; init; }
         public required double AverageRating { get; init; }
-        public required string[] Actors { get; init; } = [];
     }
 }

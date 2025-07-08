@@ -33,7 +33,6 @@ namespace MovieApi.Controllers
                         Language = m.MovieDetails.Language,
                         Budget = m.MovieDetails.Budget,
                         AverageRating = m.Reviews.Any() ? m.Reviews.Average(r => r.Rating) : 0.0,
-                        Actors = m.Actors.Select(a => a.FullName).ToArray()
                    });
 
            return Ok(await movies.ToListAsync());
@@ -54,7 +53,6 @@ namespace MovieApi.Controllers
                         Language = m.MovieDetails.Language,
                         Budget = m.MovieDetails.Budget,
                         AverageRating = m.Reviews.Any() ? m.Reviews.Average(r => r.Rating) : 0.0,
-                        Actors = m.Actors.Select(a => a.FullName).ToArray()
                     }).
                 FirstOrDefaultAsync(m => id == m.Id);
 
@@ -137,7 +135,6 @@ namespace MovieApi.Controllers
                 Language = movie.MovieDetails.Language,
                 Budget = movie.MovieDetails.Budget,
                 AverageRating = movie.Reviews.Any() ? movie.Reviews.Average(r => r.Rating) : 0.0,
-                Actors = movie.Actors.Select(a => a.FullName).ToArray()
             };
 
             return CreatedAtAction(nameof(GetMovie), new { id = movieDto.Id }, movieDto);
