@@ -1,4 +1,5 @@
-﻿using MovieApi.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using MovieApi.Data;
 using System.Diagnostics;
 
 namespace MovieApi.Extensions
@@ -11,6 +12,9 @@ namespace MovieApi.Extensions
             {
                 var serviceProvider = Scope.ServiceProvider;
                 var context = serviceProvider.GetRequiredService<MovieContext>();
+
+                // await context.Database.EnsureDeletedAsync();
+                // await context.Database.MigrateAsync();
 
                 try
                 {

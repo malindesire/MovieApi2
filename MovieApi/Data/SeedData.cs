@@ -19,13 +19,13 @@ namespace MovieApi.Data
 
         private static IEnumerable<Movie> GetMovies(int qty)
         {
-            IEnumerable<Actor> actors = GetActors(faker.Random.Int(1, 5));
-            IEnumerable<Review> reviews = GetReviews(faker.Random.Int(1, 5));
-
-            Console.WriteLine($"Actors: {actors.Count()}, Reviews: {reviews.Count()}");
 
             var movies = faker.Make(qty, () =>
             {
+
+                IEnumerable<Actor> actors = GetActors(faker.Random.Int(1, 8));
+                IEnumerable<Review> reviews = GetReviews(faker.Random.Int(1, 5));
+
                 var movie = new Movie
                 {
                     Title = faker.Lorem.Sentence(3, 5),
@@ -38,8 +38,8 @@ namespace MovieApi.Data
                         Language = faker.PickRandom(new[] { "English", "Spanish", "French", "German", "Chinese" }),
                         Budget = faker.Finance.Amount(1000000, 200000000)
                     },
-                    Actors = actors.ToList(),
-                    Reviews = reviews.ToList()
+                    Actors = [.. actors],
+                    Reviews = [.. reviews]
                 };
                 return movie;
             });
