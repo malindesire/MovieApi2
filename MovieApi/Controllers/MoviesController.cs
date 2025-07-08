@@ -26,34 +26,48 @@ namespace MovieApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie()
         {
-           var movies = _context.Movies.Select((m) => new MovieDto 
-           {
-                Id = m.Id,
-                Title = m.Title,
-                Year = m.Year,
-                Genre = m.Genre,
-                Duration = m.Duration,
-                Language = m.MovieDetails.Language,
-                Budget = m.MovieDetails.Budget,
-                AverageRating = m.Reviews.Any() ? m.Reviews.Average(r => r.Rating) : 0.0,
-                Actors = m.Actors.Select(a => a.FullName).ToArray()
-           });
+           var movies = _context.Movies.
+                Select((m) => new MovieDto 
+                   {
+                        Id = m.Id,
+                        Title = m.Title,
+                        Year = m.Year,
+                        Genre = m.Genre,
+                        Duration = m.Duration,
+                        Language = m.MovieDetails.Language,
+                        Budget = m.MovieDetails.Budget,
+                        AverageRating = m.Reviews.Any() ? m.Reviews.Average(r => r.Rating) : 0.0,
+                        Actors = m.Actors.Select(a => a.FullName).ToArray()
+                   });
 
            return Ok(await movies.ToListAsync());
         }
 
         // GET: api/Movies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Movie>> GetMovie(int id)
+        public async Task<ActionResult<MovieDto>> GetMovie(int id)
         {
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = _context.Movies.
+                Select(m => new MovieDto
+                    {
+                        Id = m.Id,
+                        Title = m.Title,
+                        Year = m.Year,
+                        Genre = m.Genre,
+                        Duration = m.Duration,
+                        Language = m.MovieDetails.Language,
+                        Budget = m.MovieDetails.Budget,
+                        AverageRating = m.Reviews.Any() ? m.Reviews.Average(r => r.Rating) : 0.0,
+                        Actors = m.Actors.Select(a => a.FullName).ToArray()
+                    }).
+                FirstOrDefaultAsync(m => id == m.Id);
 
             if (movie == null)
             {
                 return NotFound();
             }
 
-            return movie;
+            return Ok(await movie);
         }
 
         // PUT: api/Movies/5
