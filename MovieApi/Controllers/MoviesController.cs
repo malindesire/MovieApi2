@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApi.Data;
@@ -73,12 +69,17 @@ namespace MovieApi.Controllers
         // PUT: api/Movies/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMovie(int id, Movie movie)
+        public async Task<IActionResult> PutMovie(int id, MovieUpdateDto dto)
         {
-            if (id != movie.Id)
-            {
-                return BadRequest();
-            }
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
+
+            if (movie is null) return NotFound();
+
+            // Update the movie properties from the DTO
+            movie.Title = dto.Title;
+            movie.Year = dto.Year;
+            movie.Genre = dto.Genre;
+            movie.Duration = dto.Duration;
 
             _context.Entry(movie).State = EntityState.Modified;
 
