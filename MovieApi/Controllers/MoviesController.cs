@@ -108,12 +108,39 @@ namespace MovieApi.Controllers
         // POST: api/Movies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Movie>> PostMovie(Movie movie)
+        public async Task<ActionResult<Movie>> PostMovie(MovieCreateDto dto)
         {
+            var movie = new Movie
+            {
+                Title = dto.Title,
+                Year = dto.Year,
+                Genre = dto.Genre,
+                Duration = dto.Duration,
+                MovieDetails = new MovieDetails
+                {
+                    Synopsis = dto.Synopsis,
+                    Language = dto.Language,
+                    Budget = dto.Budget
+                }
+            };
+
             _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMovie", new { id = movie.Id }, movie);
+            var movieDto = new MovieDto
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                Year = movie.Year,
+                Genre = movie.Genre,
+                Duration = movie.Duration,
+                Language = movie.MovieDetails.Language,
+                Budget = movie.MovieDetails.Budget,
+                AverageRating = movie.Reviews.Any() ? movie.Reviews.Average(r => r.Rating) : 0.0,
+                Actors = movie.Actors.Select(a => a.FullName).ToArray()
+            };
+
+            return CreatedAtAction(nameof(GetMovie), new { id = movieDto.Id }, movieDto);
         }
 
         // DELETE: api/Movies/5
