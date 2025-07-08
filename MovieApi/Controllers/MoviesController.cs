@@ -71,7 +71,9 @@ namespace MovieApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovie(int id, MovieUpdateDto dto)
         {
-            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == id);
+            var movie = await _context.Movies.
+                Include(m => m.MovieDetails).
+                FirstOrDefaultAsync(m => m.Id == id);
 
             if (movie is null) return NotFound();
 
@@ -80,8 +82,9 @@ namespace MovieApi.Controllers
             movie.Year = dto.Year;
             movie.Genre = dto.Genre;
             movie.Duration = dto.Duration;
-
-            _context.Entry(movie).State = EntityState.Modified;
+            movie.MovieDetails.Synopsis = dto.Synopsis;
+            movie.MovieDetails.Language = dto.Language;
+            movie.MovieDetails.Budget = dto.Budget;
 
             try
             {
