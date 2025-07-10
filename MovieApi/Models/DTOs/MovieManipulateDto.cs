@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MovieApi.Validations;
+using System.ComponentModel.DataAnnotations;
 
 namespace MovieApi.Models.DTOs
 {
@@ -9,7 +10,7 @@ namespace MovieApi.Models.DTOs
         public string Title { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Publication year is a required field")]
-        [Range(1888, 2025, ErrorMessage = "Year must be a valid year (after 1888 and before 2025)")]
+        [YearNotInFuture]
         public int Year { get; set; }
 
         [Required(ErrorMessage = "Movie genre is a required field")]
