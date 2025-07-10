@@ -7,5 +7,6 @@
         public required int Year { get; init; }
         public required string Genre { get; init; }
         public required int Duration { get; init; }
+        public IEnumerable<ActorDto>? Actors { get; init; }
     }
 }

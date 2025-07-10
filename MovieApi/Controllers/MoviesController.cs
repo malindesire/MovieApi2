@@ -20,17 +20,25 @@ namespace MovieApi.Controllers
 
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie()
+        public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(bool includeActors)
         {
-           var movies = _context.Movies.
-                Select((m) => new MovieDto 
+           var query = includeActors ? _context.Movies.Include(m => m.Actors).AsQueryable() : _context.Movies.AsQueryable();
+
+           var movies = query
+                .Select((m) => new MovieDto 
                    {
                         Id = m.Id,
                         Title = m.Title,
                         Year = m.Year,
                         Genre = m.Genre,
                         Duration = m.Duration,
-                   });
+                        Actors = includeActors ? m.Actors.Select(a => new ActorDto
+                        {
+                            Id = a.Id,
+                            FullName = $"{a.FirstName} {a.LastName}",
+                            BirthYear = a.BirthYear,
+                        }) : null
+                });
 
            return Ok(await movies.ToListAsync());
         }
