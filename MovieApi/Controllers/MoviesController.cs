@@ -45,18 +45,26 @@ namespace MovieApi.Controllers
 
         // GET: api/Movies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<MovieDto>> GetMovie(int id)
+        public async Task<ActionResult<MovieDto>> GetMovie(int id, bool includeActors)
         {
-            var movie = _context.Movies.
-                Select(m => new MovieDto
+            var query = includeActors ? _context.Movies.Include(m => m.Actors).AsQueryable() : _context.Movies.AsQueryable();
+
+            var movie = query
+                .Select(m => new MovieDto
                     {
                         Id = m.Id,
                         Title = m.Title,
                         Year = m.Year,
                         Genre = m.Genre,
                         Duration = m.Duration,
-                    }).
-                FirstOrDefaultAsync(m => id == m.Id);
+                        Actors = includeActors ? m.Actors.Select(a => new ActorDto
+                        {
+                            Id = a.Id,
+                            FullName = $"{a.FirstName} {a.LastName}",
+                            BirthYear = a.BirthYear,
+                        }) : null
+                })
+                .FirstOrDefaultAsync(m => id == m.Id);
 
             if (movie == null)
             {
