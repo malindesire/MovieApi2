@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MovieApi.Data;
+using MovieData.Data;
 
 namespace MovieApi.Controllers
 {

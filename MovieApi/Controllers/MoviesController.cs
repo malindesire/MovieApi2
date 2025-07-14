@@ -1,7 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MovieApi.Data;
+using MovieData.Data;
 using MovieCore.Models.DTOs;
 using MovieCore.Models.Entities;
 

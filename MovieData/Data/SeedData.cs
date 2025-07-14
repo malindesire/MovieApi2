@@ -2,12 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 using MovieCore.Models.Entities;
 
-namespace MovieApi.Data
+namespace MovieData.Data
 {
     public class SeedData
     {
         private static Faker faker = new Faker("sv");
-        internal static async Task InitAsync(MovieContext context)
+        public static async Task InitAsync(MovieContext context)
         {
             if (await context.Movies.AnyAsync()) return;
 

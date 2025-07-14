@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MovieCore.Models.Entities;
 
-namespace MovieApi.Data.Configurations
+namespace MovieData.Data.Configurations
 {
     public class MovieConfiguration : IEntityTypeConfiguration<Movie>
     {
@@ -41,7 +41,7 @@ namespace MovieApi.Data.Configurations
                 .HasForeignKey(r => r.MovieId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(m => m.Actors)
+           builder.HasMany(m => m.Actors)
                     .WithMany(a => a.Movies)
                     .UsingEntity<Dictionary<string, object>>(
                         "ActorMovie",
