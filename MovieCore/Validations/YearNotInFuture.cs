@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MovieApi.Validations
+namespace MovieCore.Validations
 {
     public class YearNotInFuture : ValidationAttribute
     {

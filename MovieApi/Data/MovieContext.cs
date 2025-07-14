@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using MovieApi.Models.Entities;
+using MovieCore.Models.Entities;
 
 namespace MovieApi.Data
 {
@@ -14,8 +14,8 @@ namespace MovieApi.Data
         {
         }
 
-        public DbSet<MovieApi.Models.Entities.Movie> Movies { get; set; } = default!;
-        public DbSet<MovieApi.Models.Entities.Actor> Actors { get; set; } = default!;
-        public DbSet<MovieApi.Models.Entities.Review> Reviews { get; set; } = default!;
+        public DbSet<MovieCore.Models.Entities.Movie> Movies { get; set; } = default!;
+        public DbSet<MovieCore.Models.Entities.Actor> Actors { get; set; } = default!;
+        public DbSet<MovieCore.Models.Entities.Review> Reviews { get; set; } = default!;
     }
 }

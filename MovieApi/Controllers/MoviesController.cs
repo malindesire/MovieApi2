@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieApi.Data;
-using MovieApi.Models.DTOs;
-using MovieApi.Models.Entities;
+using MovieCore.Models.DTOs;
+using MovieCore.Models.Entities;
 
 namespace MovieApi.Controllers
 {

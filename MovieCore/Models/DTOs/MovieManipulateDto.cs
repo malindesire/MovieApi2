@@ -1,7 +1,7 @@
-﻿using MovieApi.Validations;
+﻿using MovieCore.Validations;
 using System.ComponentModel.DataAnnotations;
 
-namespace MovieApi.Models.DTOs
+namespace MovieCore.Models.DTOs
 {
     public record MovieManipulateDto
     {
