@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MovieCore.DomainContracts;
 using MovieCore.Models.Entities;
 using MovieData.Data;
 
 namespace MovieData.Repositories
 {
-    public class ReviewRepository
+    public class ReviewRepository : IReviewRepository
     {
         protected DbSet<Review> DbSet { get; }
         public ReviewRepository(MovieContext context)
