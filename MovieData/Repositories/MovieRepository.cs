@@ -2,14 +2,13 @@
 using MovieCore.DomainContracts;
 using MovieCore.Models.Entities;
 using MovieData.Data;
-using System.Collections.Generic;
 
 namespace MovieData.Repositories
 {
-    internal class MovieRepository : IMovieRepository
+    public class MovieRepository : IMovieRepository
     {
         protected DbSet<Movie> DbSet { get; }
-        public MovieRepository(MovieContext context) 
+        public MovieRepository(MovieContext context)
         {
             DbSet = context.Set<Movie>();
         }
