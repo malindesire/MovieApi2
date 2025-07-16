@@ -7,14 +7,14 @@ namespace MovieData.Repositories
 {
     public class ActorRepository : IActorRepository
     {
-        protected DbSet<Movie> DbSet { get; }
+        protected MovieContext _context { get; }
         public ActorRepository(MovieContext context)
         {
-            DbSet = context.Set<Movie>();
+            _context = context;
         }
         public void AddActorToMovie(int movieId, int actorId)
         {
-            var movie = DbSet
+            var movie = _context.Movies
                 .Include(m => m.Actors)
                 .FirstOrDefault(m => m.Id == movieId);
             if (movie == null)
@@ -22,10 +22,10 @@ namespace MovieData.Repositories
                 throw new ArgumentException($"Movie with ID {movieId} not found.");
             }
 
-            var actor = movie.Actors.FirstOrDefault(a => a.Id == actorId);
+            var actor = _context.Actors.FirstOrDefault(a => a.Id == actorId);
             if (actor == null)
             {
-                throw new ArgumentException($"Actor with ID {actorId} not found in Movie ID {movieId}.");
+                throw new ArgumentException($"Actor with ID {actorId} not found.");
             }
 
             if (movie.Actors.Any(a => a.Id == actorId))
