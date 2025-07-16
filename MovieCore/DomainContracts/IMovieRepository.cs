@@ -6,6 +6,7 @@ namespace MovieCore.DomainContracts
     {
         Task<IEnumerable<Movie>> GetAllAsync();
         Task<Movie?> GetAsync(int id);
+        Task<Movie?> GetWithDetailsAsync(int id);
         Task<bool> AnyAsync(int id);
         void Add(Movie movie);
         void Update(Movie movie);

@@ -17,6 +17,10 @@ namespace MovieData.Repositories
 
         public async Task<Movie?> GetAsync(int id) => await DbSet.FirstOrDefaultAsync(m => m.Id == id);
 
+        public async Task<Movie?> GetWithDetailsAsync(int id) => await DbSet
+            .Include(m => m.MovieDetails)
+            .FirstOrDefaultAsync(m => m.Id == id);
+
         public async Task<bool> AnyAsync(int id) => await DbSet.AnyAsync(m => m.Id == id);
 
         public void Add(Movie movie) => DbSet.Add(movie);
@@ -24,5 +28,7 @@ namespace MovieData.Repositories
         public void Update(Movie movie) => DbSet.Update(movie);
 
         public void Remove(Movie movie) => DbSet.Remove(movie);
+
+
     }
 }
