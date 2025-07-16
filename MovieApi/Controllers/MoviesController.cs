@@ -64,6 +64,11 @@ namespace MovieApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MovieDto>> GetMovie(int id, bool includeActors)
         {
+            if (!await _uow.Movies.AnyAsync(id))
+            {
+                return NotFound();
+            }
+
             var movie = await _uow.Movies.GetAsync(id);
             if (movie == null)
             {
@@ -108,46 +113,51 @@ namespace MovieApi.Controllers
         }
 
         // GET: api/Movies/5/details
-        //[HttpGet("{id}/details")]
-        //public async Task<ActionResult<MovieDetailDto>> GetMovieDetail(int id)
-        //{
-        // return Ok(await _unitOfWork.Movies.GetWithDetailsAsync(id));
+       [HttpGet("{id}/details")]
+        public async Task<ActionResult<MovieDetailDto>> GetMovieDetail(int id)
+        {
+            if (!await _uow.Movies.AnyAsync(id))
+            {
+                return NotFound();
+            }
 
-        //    var movieDetails = _context.Movies.
-        //        Select(m => new MovieDetailDto
-        //        {
-        //            Id = m.Id,
-        //            Title = m.Title,
-        //            Year = m.Year,
-        //            Genre = m.Genre,
-        //            Duration = m.Duration,
-        //            Language = m.MovieDetails.Language,
-        //            Budget = m.MovieDetails.Budget,
-        //            AverageRating = m.Reviews.Any() ? m.Reviews.Average(r => r.Rating) : 0.0,
-        //            Synopsis = m.MovieDetails.Synopsis,
-        //            Reviews = m.Reviews.Select(r => new ReviewDto
-        //            {
-        //                Id = r.Id,
-        //                Rating = r.Rating,
-        //                Comment = r.Comment,
-        //                ReviewerName = r.ReviewerName
-        //            }).ToList(),
-        //            Actors = m.Actors.Select(a => new ActorDto
-        //            {
-        //                Id = a.Id,
-        //                FullName = $"{a.FirstName} {a.LastName}",
-        //                BirthYear = a.BirthYear,
-        //            }).ToList()
-        //        }).
-        //        FirstOrDefaultAsync(m => id == m.Id);
+            var movie = await _uow.Movies.GetWithDetailsAsync(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
 
-        //    if (movieDetails == null) return NotFound();
+            var dto = new MovieDetailDto
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                Year = movie.Year,
+                Genre = movie.Genre,
+                Duration = movie.Duration,
+                Language = movie.MovieDetails.Language,
+                Budget = movie.MovieDetails.Budget,
+                Synopsis = movie.MovieDetails.Synopsis,
+                AverageRating = movie.Reviews.Any() ? movie.Reviews.Average(r => r.Rating) : 0.0,
+                Reviews = movie.Reviews.Select(r => new ReviewDto
+                {
+                    Id = r.Id,
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    ReviewerName = r.ReviewerName
+                }).ToList(),
+                Actors = movie.Actors.Select(a => new ActorDto
+                {
+                    Id = a.Id,
+                    FullName = $"{a.FirstName} {a.LastName}",
+                    BirthYear = a.BirthYear
+                }).ToList()
+            };
 
-        //    return Ok(await movieDetails);
-        //}
+            return Ok(dto);
+        }
 
-         // PUT: api/Movies/5
-         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/Movies/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovie(int id, MovieUpdateDto dto)
         {
