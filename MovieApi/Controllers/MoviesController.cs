@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MovieData.Data;
+using MovieCore.DomainContracts;
 using MovieCore.Models.DTOs;
 using MovieCore.Models.Entities;
-using MovieCore.DomainContracts;
 
 namespace MovieApi.Controllers
 {
@@ -39,25 +37,25 @@ namespace MovieApi.Controllers
 
             return Ok(dtos);
 
-           //var query = includeActors ? _context.Movies.Include(m => m.Actors).AsQueryable() : _context.Movies.AsQueryable();
+            //var query = includeActors ? _context.Movies.Include(m => m.Actors).AsQueryable() : _context.Movies.AsQueryable();
 
-           //var movies = query
-           //     .Select((m) => new MovieDto 
-           //        {
-           //             Id = m.Id,
-           //             Title = m.Title,
-           //             Year = m.Year,
-           //             Genre = m.Genre,
-           //             Duration = m.Duration,
-           //             Actors = includeActors ? m.Actors.Select(a => new ActorDto
-           //             {
-           //                 Id = a.Id,
-           //                 FullName = $"{a.FirstName} {a.LastName}",
-           //                 BirthYear = a.BirthYear,
-           //             }) : null
-           //     });
+            //var movies = query
+            //     .Select((m) => new MovieDto 
+            //        {
+            //             Id = m.Id,
+            //             Title = m.Title,
+            //             Year = m.Year,
+            //             Genre = m.Genre,
+            //             Duration = m.Duration,
+            //             Actors = includeActors ? m.Actors.Select(a => new ActorDto
+            //             {
+            //                 Id = a.Id,
+            //                 FullName = $"{a.FirstName} {a.LastName}",
+            //                 BirthYear = a.BirthYear,
+            //             }) : null
+            //     });
 
-           //return Ok(await movies.ToListAsync());
+            //return Ok(await movies.ToListAsync());
         }
 
         // GET: api/Movies/5
@@ -113,7 +111,7 @@ namespace MovieApi.Controllers
         }
 
         // GET: api/Movies/5/details
-       [HttpGet("{id}/details")]
+        [HttpGet("{id}/details")]
         public async Task<ActionResult<MovieDetailDto>> GetMovieDetail(int id)
         {
             if (!await _uow.Movies.AnyAsync(id))
@@ -201,7 +199,7 @@ namespace MovieApi.Controllers
                 }
             };
 
-                _uow.Movies.Add(movie);
+            _uow.Movies.Add(movie);
             await _uow.CompleteAsync();
 
             var movieDto = new MovieDetailDto
@@ -219,25 +217,25 @@ namespace MovieApi.Controllers
             return CreatedAtAction(nameof(GetMovie), new { id = movieDto.Id }, movieDto);
         }
 
-        //// DELETE: api/Movies/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteMovie(int id)
-        //{
-        //    var movie = await _context.Movies.FindAsync(id);
-        //    if (movie == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // DELETE: api/Movies/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMovie(int id)
+        {
+            if (!await _uow.Movies.AnyAsync(id))
+            {
+                return NotFound();
+            }
 
-        //    _context.Movies.Remove(movie);
-        //    await _context.SaveChangesAsync();
+            var movie = await _uow.Movies.GetAsync(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
 
-        //    return NoContent();
-        //}
+            _uow.Movies.Remove(movie);
+            await _uow.CompleteAsync();
 
-        //private bool MovieExists(int id)
-        //{
-        //    return _context.Movies.Any(e => e.Id == id);
-        //}
+            return NoContent();
+        }
     }
 }
