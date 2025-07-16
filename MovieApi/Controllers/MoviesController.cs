@@ -181,39 +181,43 @@ namespace MovieApi.Controllers
             return NoContent();
         }
 
-        //// POST: api/Movies
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<Movie>> PostMovie(MovieCreateDto dto)
-        //{
-        //    var movie = new Movie
-        //    {
-        //        Title = dto.Title,
-        //        Year = dto.Year,
-        //        Genre = dto.Genre,
-        //        Duration = dto.Duration,
-        //        MovieDetails = new MovieDetails
-        //        {
-        //            Synopsis = dto.Synopsis,
-        //            Language = dto.Language,
-        //            Budget = dto.Budget
-        //        }
-        //    };
+        // POST: api/Movies
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<Movie>> PostMovie(MovieCreateDto dto)
+        {
 
-        //    _context.Movies.Add(movie);
-        //    await _context.SaveChangesAsync();
+            var movie = new Movie
+            {
+                Title = dto.Title,
+                Year = dto.Year,
+                Genre = dto.Genre,
+                Duration = dto.Duration,
+                MovieDetails = new MovieDetails
+                {
+                    Synopsis = dto.Synopsis,
+                    Language = dto.Language,
+                    Budget = dto.Budget
+                }
+            };
 
-        //    var movieDto = new MovieDto
-        //    {
-        //        Id = movie.Id,
-        //        Title = movie.Title,
-        //        Year = movie.Year,
-        //        Genre = movie.Genre,
-        //        Duration = movie.Duration,
-        //    };
+                _uow.Movies.Add(movie);
+            await _uow.CompleteAsync();
 
-        //    return CreatedAtAction(nameof(GetMovie), new { id = movieDto.Id }, movieDto);
-        //}
+            var movieDto = new MovieDetailDto
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                Year = movie.Year,
+                Genre = movie.Genre,
+                Duration = movie.Duration,
+                Synopsis = movie.MovieDetails.Synopsis,
+                Language = movie.MovieDetails.Language,
+                Budget = movie.MovieDetails.Budget,
+            };
+
+            return CreatedAtAction(nameof(GetMovie), new { id = movieDto.Id }, movieDto);
+        }
 
         //// DELETE: api/Movies/5
         //[HttpDelete("{id}")]
