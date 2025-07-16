@@ -19,6 +19,8 @@ namespace MovieData.Repositories
 
         public async Task<Movie?> GetWithDetailsAsync(int id) => await DbSet
             .Include(m => m.MovieDetails)
+            .Include(m => m.Reviews)
+            .Include(m => m.Actors)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         public async Task<bool> AnyAsync(int id) => await DbSet.AnyAsync(m => m.Id == id);
