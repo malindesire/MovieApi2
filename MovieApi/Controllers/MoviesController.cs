@@ -22,7 +22,22 @@ namespace MovieApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(bool includeActors)
         {
-            return Ok(await _unitOfWork.Movies.GetAllAsync());
+            var movies = await _unitOfWork.Movies.GetAllAsync();
+            if (movies == null || !movies.Any())
+            {
+                return NotFound();
+            }
+
+            var dtos = movies.Select(m => new MovieDto
+            {
+                Id = m.Id,
+                Title = m.Title,
+                Year = m.Year,
+                Genre = m.Genre,
+                Duration = m.Duration,
+            }).ToList();
+
+            return Ok(dtos);
 
            //var query = includeActors ? _context.Movies.Include(m => m.Actors).AsQueryable() : _context.Movies.AsQueryable();
 
@@ -49,7 +64,22 @@ namespace MovieApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MovieDto>> GetMovie(int id, bool includeActors)
         {
-            return Ok(await _unitOfWork.Movies.GetAsync(id));
+            var movie = await _unitOfWork.Movies.GetAsync(id);
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            var dto = new MovieDto
+            {
+                Id = movie.Id,
+                Title = movie.Title,
+                Year = movie.Year,
+                Genre = movie.Genre,
+                Duration = movie.Duration,
+            };
+
+            return Ok(dto);
             //    var query = includeActors ? _context.Movies.Include(m => m.Actors).AsQueryable() : _context.Movies.AsQueryable();
 
             //    var movie = query
