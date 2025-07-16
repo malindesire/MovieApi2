@@ -11,18 +11,18 @@ namespace MovieApi.Controllers
     [ApiController]
     public class MoviesController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _uow;
 
         public MoviesController(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            _uow = unitOfWork;
         }
 
         // GET: api/Movies
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(bool includeActors)
         {
-            var movies = await _unitOfWork.Movies.GetAllAsync();
+            var movies = await _uow.Movies.GetAllAsync();
             if (movies == null || !movies.Any())
             {
                 return NotFound();
@@ -64,7 +64,7 @@ namespace MovieApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MovieDto>> GetMovie(int id, bool includeActors)
         {
-            var movie = await _unitOfWork.Movies.GetAsync(id);
+            var movie = await _uow.Movies.GetAsync(id);
             if (movie == null)
             {
                 return NotFound();
@@ -111,7 +111,7 @@ namespace MovieApi.Controllers
         //[HttpGet("{id}/details")]
         //public async Task<ActionResult<MovieDetailDto>> GetMovieDetail(int id)
         //{
-        // return Ok(await _unitOfWork.Movies.GetDetailsAsync(id));
+        // return Ok(await _unitOfWork.Movies.GetWithDetailsAsync(id));
 
         //    var movieDetails = _context.Movies.
         //        Select(m => new MovieDetailDto
@@ -146,43 +146,30 @@ namespace MovieApi.Controllers
         //    return Ok(await movieDetails);
         //}
 
-        // PUT: api/Movies/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutMovie(int id, MovieUpdateDto dto)
-        //{
-        //var movie = await _unitOfWork.Movies.GetAsync(id);
+         // PUT: api/Movies/5
+         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutMovie(int id, MovieUpdateDto dto)
+        {
+            var movie = await _uow.Movies.GetWithDetailsAsync(id);
 
-        //if (movie is null) return NotFound();
+            if (movie is null) return NotFound();
 
 
-        //// Update the movie properties from the DTO
-        //movie.Title = dto.Title;
-        //movie.Year = dto.Year;
-        //movie.Genre = dto.Genre;
-        //movie.Duration = dto.Duration;
-        //movie.MovieDetails.Synopsis = dto.Synopsis;
-        //movie.MovieDetails.Language = dto.Language;
-        //movie.MovieDetails.Budget = dto.Budget;
+            // Update the movie properties from the DTO
+            movie.Title = dto.Title;
+            movie.Year = dto.Year;
+            movie.Genre = dto.Genre;
+            movie.Duration = dto.Duration;
+            movie.MovieDetails.Synopsis = dto.Synopsis;
+            movie.MovieDetails.Language = dto.Language;
+            movie.MovieDetails.Budget = dto.Budget;
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!MovieExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+            _uow.Movies.Update(movie);
+            await _uow.CompleteAsync();
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         //// POST: api/Movies
         //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
