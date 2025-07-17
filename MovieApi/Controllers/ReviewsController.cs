@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MovieData.Data;
+using MovieCore.DomainContracts;
 using MovieCore.Models.DTOs;
+using MovieData.Data;
 
 namespace MovieApi.Controllers
 {
@@ -9,28 +9,39 @@ namespace MovieApi.Controllers
     [ApiController]
     public class ReviewsController : ControllerBase
     {
-        private readonly MovieContext _context;
+        private readonly IUnitOfWork _uow;
 
-        public ReviewsController(MovieContext context)
+        public ReviewsController(MovieContext context, IUnitOfWork uow)
         {
-            _context = context;
+            _uow = uow;
         }
 
         // GET: api/movies/{movieId}/reviews
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReview(int movieId)
         {
-            var reviews = _context.Reviews
-                .Where(r => r.MovieId == movieId)
-                .Select(r => new ReviewDto
-                {
-                    Id = r.Id,
-                    ReviewerName = r.ReviewerName,
-                    Comment = r.Comment,
-                    Rating = r.Rating
-                });
+            if (!await _uow.Movies.AnyAsync(movieId))
+            {
+                return NotFound($"Movie with ID {movieId} not found.");
+            }
 
-            return Ok(await reviews.ToListAsync());
+            var reviews = await _uow.Reviews.GetAllAsync(movieId);
+            if (reviews == null || !reviews.Any())
+            {
+                return NotFound($"No reviews found for movie with ID {movieId}.");
+            }
+
+            var reviewDtos = reviews.Select(r => new ReviewDto
+            {
+                Id = r.Id,
+                ReviewerName = r.ReviewerName,
+                Comment = r.Comment,
+                Rating = r.Rating,
+
+            }).ToList();
+
+
+            return Ok(reviewDtos);
         }
     }
 }
