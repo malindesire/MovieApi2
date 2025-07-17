@@ -2,7 +2,7 @@
 using MovieCore.Models.DTOs;
 using MovieServiceContracts;
 
-namespace MovieApi.Controllers
+namespace MoviePresentation.Controllers
 {
     [Route("api/movies")]
     [ApiController]
