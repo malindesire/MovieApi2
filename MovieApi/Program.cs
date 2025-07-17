@@ -3,6 +3,8 @@ using MovieApi.Extensions;
 using MovieCore.DomainContracts;
 using MovieData.Data;
 using MovieData.Repositories;
+using MovieServiceContracts;
+using MovieServices;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MovieContext>(options =>
@@ -14,6 +16,7 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
 var app = builder.Build();
 
