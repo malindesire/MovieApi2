@@ -68,7 +68,7 @@ namespace MovieServices
             };
         }
 
-        public async Task<MovieDetailDto> GetMovieWithDetails(int id)
+        public async Task<MovieDetailDto> GetMovieWithDetailsAsync(int id)
         {
             var movie = await _uow.Movies.GetWithDetailsAsync(id);
 
@@ -109,7 +109,7 @@ namespace MovieServices
 
         }
 
-        public async Task UpdateMovie(int id, MovieUpdateDto dto)
+        public async Task<bool> UpdateMovieAsync(int id, MovieUpdateDto dto)
         {
             var movie = await _uow.Movies.GetWithDetailsAsync(id);
 
@@ -129,9 +129,11 @@ namespace MovieServices
 
             _uow.Movies.Update(movie);
             await _uow.CompleteAsync();
+
+            return true;
         }
 
-        public async Task<MovieDetailDto> AddMovie(MovieCreateDto dto)
+        public async Task<MovieDetailDto> AddMovieAsync(MovieCreateDto dto)
         {
             var movie = new Movie 
             {
@@ -163,7 +165,7 @@ namespace MovieServices
             };
         }
 
-        public async Task RemoveMovie(int id)
+        public async Task<bool> RemoveMovieAsync(int id)
         {
             var movie = await _uow.Movies.GetAsync(id, false);
             if (movie == null)
@@ -173,6 +175,8 @@ namespace MovieServices
 
             _uow.Movies.Remove(movie);
             await _uow.CompleteAsync();
+
+            return true;
         }
     }
 }

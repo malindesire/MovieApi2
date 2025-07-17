@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MovieCore.DomainContracts;
 using MovieCore.Models.DTOs;
-using MovieCore.Models.Entities;
+using MovieServiceContracts;
 
 namespace MovieApi.Controllers
 {
@@ -9,116 +9,30 @@ namespace MovieApi.Controllers
     [ApiController]
     public class MoviesController : ControllerBase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IServiceManager _serviceManager;
 
-        public MoviesController(IUnitOfWork unitOfWork)
+        public MoviesController(IUnitOfWork unitOfWork, IServiceManager serviceManager)
         {
-            _uow = unitOfWork;
+            _serviceManager = serviceManager;
         }
 
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(bool includeActors)
-        {
-            var movies = await _uow.Movies.GetAllAsync(includeActors);
-            if (movies == null || !movies.Any())
-            {
-                return NotFound();
-            }
-
-            var dtos = movies.Select(m => new MovieDto
-            {
-                Id = m.Id,
-                Title = m.Title,
-                Year = m.Year,
-                Genre = m.Genre,
-                Duration = m.Duration,
-                Actors = includeActors ? m.Actors.Select(a => new ActorDto
-                {
-                    Id = a.Id,
-                    FullName = $"{a.FirstName} {a.LastName}",
-                    BirthYear = a.BirthYear
-                }).ToList() : null
-            }).ToList();
-
-            return Ok(dtos);
-        }
+        public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(bool includeActors) =>
+                Ok(await _serviceManager.Movies.GetAllMoviesAsync(includeActors));
 
         // GET: api/Movies/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MovieDto>> GetMovie(int id, bool includeActors)
         {
-            if (!await _uow.Movies.AnyAsync(id))
-            {
-                return NotFound();
-            }
-
-            var movie = await _uow.Movies.GetAsync(id, includeActors);
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            var dto = new MovieDto
-            {
-                Id = movie.Id,
-                Title = movie.Title,
-                Year = movie.Year,
-                Genre = movie.Genre,
-                Duration = movie.Duration,
-                Actors = includeActors ? movie.Actors.Select(a => new ActorDto
-                {
-                    Id = a.Id,
-                    FullName = $"{a.FirstName} {a.LastName}",
-                    BirthYear = a.BirthYear
-                }).ToList() : null
-            };
-
-            return Ok(dto);
+            return Ok(await _serviceManager.Movies.GetMovieAsync(id, includeActors));
         }
 
         // GET: api/Movies/5/details
         [HttpGet("{id}/details")]
         public async Task<ActionResult<MovieDetailDto>> GetMovieDetail(int id)
         {
-            if (!await _uow.Movies.AnyAsync(id))
-            {
-                return NotFound();
-            }
-
-            var movie = await _uow.Movies.GetWithDetailsAsync(id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            var dto = new MovieDetailDto
-            {
-                Id = movie.Id,
-                Title = movie.Title,
-                Year = movie.Year,
-                Genre = movie.Genre,
-                Duration = movie.Duration,
-                Language = movie.MovieDetails.Language,
-                Budget = movie.MovieDetails.Budget,
-                Synopsis = movie.MovieDetails.Synopsis,
-                AverageRating = movie.Reviews.Any() ? movie.Reviews.Average(r => r.Rating) : 0.0,
-                Reviews = movie.Reviews.Select(r => new ReviewDto
-                {
-                    Id = r.Id,
-                    Rating = r.Rating,
-                    Comment = r.Comment,
-                    ReviewerName = r.ReviewerName
-                }).ToList(),
-                Actors = movie.Actors.Select(a => new ActorDto
-                {
-                    Id = a.Id,
-                    FullName = $"{a.FirstName} {a.LastName}",
-                    BirthYear = a.BirthYear
-                }).ToList()
-            };
-
-            return Ok(dto);
+            return Ok(await _serviceManager.Movies.GetMovieWithDetailsAsync(id));
         }
 
         // PUT: api/Movies/5
@@ -126,61 +40,17 @@ namespace MovieApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovie(int id, MovieUpdateDto dto)
         {
-            var movie = await _uow.Movies.GetWithDetailsAsync(id);
-
-            if (movie is null) return NotFound();
-
-
-            // Update the movie properties from the DTO
-            movie.Title = dto.Title;
-            movie.Year = dto.Year;
-            movie.Genre = dto.Genre;
-            movie.Duration = dto.Duration;
-            movie.MovieDetails.Synopsis = dto.Synopsis;
-            movie.MovieDetails.Language = dto.Language;
-            movie.MovieDetails.Budget = dto.Budget;
-
-            _uow.Movies.Update(movie);
-            await _uow.CompleteAsync();
-
-            return NoContent();
+            return await _serviceManager.Movies.UpdateMovieAsync(id, dto) 
+                ? NoContent() 
+                : NotFound();
         }
 
         // POST: api/Movies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Movie>> PostMovie(MovieCreateDto dto)
+        public async Task<ActionResult<MovieDetailDto>> PostMovie(MovieCreateDto dto)
         {
-
-            var movie = new Movie
-            {
-                Title = dto.Title,
-                Year = dto.Year,
-                Genre = dto.Genre,
-                Duration = dto.Duration,
-                MovieDetails = new MovieDetails
-                {
-                    Synopsis = dto.Synopsis,
-                    Language = dto.Language,
-                    Budget = dto.Budget
-                }
-            };
-
-            _uow.Movies.Add(movie);
-            await _uow.CompleteAsync();
-
-            var movieDto = new MovieDetailDto
-            {
-                Id = movie.Id,
-                Title = movie.Title,
-                Year = movie.Year,
-                Genre = movie.Genre,
-                Duration = movie.Duration,
-                Synopsis = movie.MovieDetails.Synopsis,
-                Language = movie.MovieDetails.Language,
-                Budget = movie.MovieDetails.Budget,
-            };
-
+            var movieDto = await _serviceManager.Movies.AddMovieAsync(dto);
             return CreatedAtAction(nameof(GetMovie), new { id = movieDto.Id }, movieDto);
         }
 
@@ -188,21 +58,9 @@ namespace MovieApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMovie(int id)
         {
-            if (!await _uow.Movies.AnyAsync(id))
-            {
-                return NotFound();
-            }
-
-            var movie = await _uow.Movies.GetAsync(id);
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            _uow.Movies.Remove(movie);
-            await _uow.CompleteAsync();
-
-            return NoContent();
+            return await _serviceManager.Movies.RemoveMovieAsync(id) 
+                ? NoContent() 
+                : NotFound();
         }
     }
 }

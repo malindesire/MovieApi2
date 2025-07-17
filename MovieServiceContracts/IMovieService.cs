@@ -6,9 +6,9 @@ namespace MovieServiceContracts
     {
         Task<IEnumerable<MovieDto>> GetAllMoviesAsync(bool includeActors);
         Task<MovieDto> GetMovieAsync(int id, bool includeActors);
-        Task<MovieDetailDto> GetMovieWithDetails(int id);
-        Task UpdateMovie(int id, MovieUpdateDto dto);
-        Task<MovieDetailDto> AddMovie(MovieCreateDto dto);
-        Task RemoveMovie(int id);
+        Task<MovieDetailDto> GetMovieWithDetailsAsync(int id);
+        Task<bool> UpdateMovieAsync(int id, MovieUpdateDto dto);
+        Task<MovieDetailDto> AddMovieAsync(MovieCreateDto dto);
+        Task<bool> RemoveMovieAsync(int id);
     }
 }
