@@ -7,9 +7,12 @@ namespace MovieServices
     {
         public IMovieService Movies { get; }
 
+        public IReviewService Reviews { get; }
+
         public ServiceManager(IUnitOfWork uow)
         {
             Movies = new MovieService(uow);
+            Reviews = new ReviewService(uow);
         }
     }
 }
