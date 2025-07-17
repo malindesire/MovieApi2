@@ -20,7 +20,7 @@ namespace MovieApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(bool includeActors)
         {
-            var movies = await _uow.Movies.GetAllAsync();
+            var movies = await _uow.Movies.GetAllAsync(includeActors);
             if (movies == null || !movies.Any())
             {
                 return NotFound();
@@ -33,29 +33,15 @@ namespace MovieApi.Controllers
                 Year = m.Year,
                 Genre = m.Genre,
                 Duration = m.Duration,
+                Actors = includeActors ? m.Actors.Select(a => new ActorDto
+                {
+                    Id = a.Id,
+                    FullName = $"{a.FirstName} {a.LastName}",
+                    BirthYear = a.BirthYear
+                }).ToList() : null
             }).ToList();
 
             return Ok(dtos);
-
-            //var query = includeActors ? _context.Movies.Include(m => m.Actors).AsQueryable() : _context.Movies.AsQueryable();
-
-            //var movies = query
-            //     .Select((m) => new MovieDto 
-            //        {
-            //             Id = m.Id,
-            //             Title = m.Title,
-            //             Year = m.Year,
-            //             Genre = m.Genre,
-            //             Duration = m.Duration,
-            //             Actors = includeActors ? m.Actors.Select(a => new ActorDto
-            //             {
-            //                 Id = a.Id,
-            //                 FullName = $"{a.FirstName} {a.LastName}",
-            //                 BirthYear = a.BirthYear,
-            //             }) : null
-            //     });
-
-            //return Ok(await movies.ToListAsync());
         }
 
         // GET: api/Movies/5
@@ -67,7 +53,7 @@ namespace MovieApi.Controllers
                 return NotFound();
             }
 
-            var movie = await _uow.Movies.GetAsync(id);
+            var movie = await _uow.Movies.GetAsync(id, includeActors);
             if (movie == null)
             {
                 return NotFound();
@@ -80,34 +66,15 @@ namespace MovieApi.Controllers
                 Year = movie.Year,
                 Genre = movie.Genre,
                 Duration = movie.Duration,
+                Actors = includeActors ? movie.Actors.Select(a => new ActorDto
+                {
+                    Id = a.Id,
+                    FullName = $"{a.FirstName} {a.LastName}",
+                    BirthYear = a.BirthYear
+                }).ToList() : null
             };
 
             return Ok(dto);
-            //    var query = includeActors ? _context.Movies.Include(m => m.Actors).AsQueryable() : _context.Movies.AsQueryable();
-
-            //    var movie = query
-            //        .Select(m => new MovieDto
-            //            {
-            //                Id = m.Id,
-            //                Title = m.Title,
-            //                Year = m.Year,
-            //                Genre = m.Genre,
-            //                Duration = m.Duration,
-            //                Actors = includeActors ? m.Actors.Select(a => new ActorDto
-            //                {
-            //                    Id = a.Id,
-            //                    FullName = $"{a.FirstName} {a.LastName}",
-            //                    BirthYear = a.BirthYear,
-            //                }) : null
-            //        })
-            //        .FirstOrDefaultAsync(m => id == m.Id);
-
-            //    if (movie == null)
-            //    {
-            //        return NotFound();
-            //    }
-
-            //    return Ok(await movie);
         }
 
         // GET: api/Movies/5/details

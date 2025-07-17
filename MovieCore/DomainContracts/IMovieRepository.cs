@@ -4,8 +4,8 @@ namespace MovieCore.DomainContracts
 {
     public interface IMovieRepository
     {
-        Task<IEnumerable<Movie>> GetAllAsync();
-        Task<Movie?> GetAsync(int id);
+        Task<IEnumerable<Movie>> GetAllAsync(bool include = false);
+        Task<Movie?> GetAsync(int id, bool include = false);
         Task<Movie?> GetWithDetailsAsync(int id);
         Task<bool> AnyAsync(int id);
         void Add(Movie movie);
