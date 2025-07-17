@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MovieCore.DomainContracts;
 using MovieCore.Models.DTOs;
-using MovieData.Data;
+using MovieServiceContracts;
 
 namespace MovieApi.Controllers
 {
@@ -9,39 +8,16 @@ namespace MovieApi.Controllers
     [ApiController]
     public class ReviewsController : ControllerBase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IServiceManager _serviceManager;
 
-        public ReviewsController(MovieContext context, IUnitOfWork uow)
+        public ReviewsController(IServiceManager serviceManager)
         {
-            _uow = uow;
+            _serviceManager = serviceManager;
         }
 
         // GET: api/movies/{movieId}/reviews
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReview(int movieId)
-        {
-            if (!await _uow.Movies.AnyAsync(movieId))
-            {
-                return NotFound($"Movie with ID {movieId} not found.");
-            }
-
-            var reviews = await _uow.Reviews.GetAllAsync(movieId);
-            if (reviews == null || !reviews.Any())
-            {
-                return NotFound($"No reviews found for movie with ID {movieId}.");
-            }
-
-            var reviewDtos = reviews.Select(r => new ReviewDto
-            {
-                Id = r.Id,
-                ReviewerName = r.ReviewerName,
-                Comment = r.Comment,
-                Rating = r.Rating,
-
-            }).ToList();
-
-
-            return Ok(reviewDtos);
-        }
+        public async Task<ActionResult<IEnumerable<ReviewDto>>> GetReview(int movieId) =>
+            Ok(await _serviceManager.Reviews.GetReviewsAsync(movieId));
     }
 }
