@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MovieCore.DomainContracts;
 using MovieServiceContracts;
 
 namespace MovieApi.Controllers

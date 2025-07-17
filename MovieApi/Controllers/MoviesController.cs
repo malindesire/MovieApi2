@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MovieCore.DomainContracts;
 using MovieCore.Models.DTOs;
 using MovieServiceContracts;
 
@@ -11,7 +10,7 @@ namespace MovieApi.Controllers
     {
         private readonly IServiceManager _serviceManager;
 
-        public MoviesController(IUnitOfWork unitOfWork, IServiceManager serviceManager)
+        public MoviesController(IServiceManager serviceManager)
         {
             _serviceManager = serviceManager;
         }
@@ -40,8 +39,8 @@ namespace MovieApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovie(int id, MovieUpdateDto dto)
         {
-            return await _serviceManager.Movies.UpdateMovieAsync(id, dto) 
-                ? NoContent() 
+            return await _serviceManager.Movies.UpdateMovieAsync(id, dto)
+                ? NoContent()
                 : NotFound();
         }
 
@@ -58,8 +57,8 @@ namespace MovieApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMovie(int id)
         {
-            return await _serviceManager.Movies.RemoveMovieAsync(id) 
-                ? NoContent() 
+            return await _serviceManager.Movies.RemoveMovieAsync(id)
+                ? NoContent()
                 : NotFound();
         }
     }

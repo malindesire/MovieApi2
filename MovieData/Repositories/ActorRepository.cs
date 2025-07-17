@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieCore.DomainContracts;
-using MovieCore.Models.Entities;
 using MovieData.Data;
 
 namespace MovieData.Repositories
