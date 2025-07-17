@@ -4,5 +4,6 @@
     {
         public IMovieService Movies { get; }
         public IReviewService Reviews { get; }
+        public IActorService Actors { get; }
     }
 }
