@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MovieCore.DomainContracts;
+using MovieServiceContracts;
 
 namespace MovieApi.Controllers
 {
@@ -7,11 +8,11 @@ namespace MovieApi.Controllers
     [ApiController]
     public class ActorsController : ControllerBase
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IServiceManager _serviceManager;
 
-        public ActorsController(IUnitOfWork unitOfWork)
+        public ActorsController(IServiceManager serviceManager)
         {
-            _uow = unitOfWork;
+            _serviceManager = serviceManager;
         }
 
         // POST: api/Movies/5/Actors/3
@@ -19,8 +20,7 @@ namespace MovieApi.Controllers
         [HttpPost("/api/movies/{movieId}/actors/{actorId}")]
         public async Task<ActionResult> AddActorToMovie(int movieId, int actorId)
         {
-            _uow.Actors.AddActorToMovie(movieId, actorId);
-            await _uow.CompleteAsync();
+            await _serviceManager.Actors.AddActorToMovieAsync(movieId, actorId);
 
             return Ok($"Actor with ID {actorId} is added to movie with ID {movieId}");
         }
