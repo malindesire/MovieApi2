@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MovieCore.DomainContracts;
 using MovieCore.Models.Entities;
+using MovieCore.Requests;
 using MovieData.Data;
 
 namespace MovieData.Repositories
@@ -13,11 +14,18 @@ namespace MovieData.Repositories
             DbSet = context.Set<Movie>();
         }
 
-        public async Task<IEnumerable<Movie>> GetAllAsync(bool include)
+        public async Task<(IEnumerable<Movie>, PaginationMetadata)> GetAllAsync(bool include, MoviePaginationParamaters paginationParamaters)
         {
-            return include ?
-                  await DbSet.Include(m => m.Actors).ToListAsync() :
-                  await DbSet.ToListAsync();
+            var pageSize = paginationParamaters.PageSize;
+            var pageNumber = paginationParamaters.PageNumber;
+
+            var totalItemCount = await DbSet.CountAsync();
+            var paginationMetadata = new PaginationMetadata(pageSize, pageNumber, totalItemCount);
+            
+            var query = include ? DbSet.Include(m => m.Actors).AsQueryable() : DbSet.AsQueryable();
+            var movies = await query.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
+
+            return (movies, paginationMetadata);
         }
 
         public async Task<Movie?> GetAsync(int id, bool include)
