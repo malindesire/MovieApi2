@@ -1,6 +1,7 @@
 ﻿using MovieCore.DomainContracts;
 using MovieCore.Models.DTOs;
 using MovieCore.Models.Entities;
+using MovieCore.Requests;
 using MovieServiceContracts;
 
 namespace MovieServices
@@ -14,16 +15,16 @@ namespace MovieServices
             this._uow = uow;
         }
 
-        public async Task<IEnumerable<MovieDto>> GetAllMoviesAsync(bool includeActors)
+        public async Task<(IEnumerable<MovieDto>, PaginationMetadata)> GetAllMoviesAsync(bool includeActors, MoviePaginationParamaters paginationParamaters)
         {
-            var movies = await _uow.Movies.GetAllAsync(includeActors);
+            var (movies, paginationMetadata) = await _uow.Movies.GetAllAsync(includeActors, paginationParamaters);
             
             if (movies == null || !movies.Any())
             {
-                return Enumerable.Empty<MovieDto>();
+                return (Enumerable.Empty<MovieDto>(), paginationMetadata);
             }
 
-            return movies.Select(m => new MovieDto
+            return (movies.Select(m => new MovieDto
             {
                 Id = m.Id,
                 Title = m.Title,
@@ -38,7 +39,7 @@ namespace MovieServices
                             BirthYear = a.BirthYear
                         })
                     .ToList() : null
-            });
+            }), paginationMetadata);
         }
 
         public async Task<MovieDto> GetMovieAsync(int id, bool includeActors)

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MovieCore.Models.DTOs;
+using MovieCore.Requests;
 using MovieServiceContracts;
+using System.Text.Json;
 
 namespace MoviePresentation.Controllers
 {
@@ -17,12 +19,18 @@ namespace MoviePresentation.Controllers
 
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MovieDto>>> GetMovie(bool includeActors) =>
-                Ok(await _serviceManager.Movies.GetAllMoviesAsync(includeActors));
+        public async Task<ActionResult<(IEnumerable<MovieDto>, PaginationMetadata)>> GetMovie(
+            [FromQuery] MoviePaginationParamaters paginationParamaters, bool includeActors = false)
+        {
+            var (movies, paginationMetadata) = await _serviceManager.Movies.GetAllMoviesAsync(includeActors, paginationParamaters);
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
-        // GET: api/Movies/5
+            return Ok(movies);
+        }
+
+        // GET: api/Movies/5 
         [HttpGet("{id}")]
-        public async Task<ActionResult<MovieDto>> GetMovie(int id, bool includeActors)
+        public async Task<ActionResult<MovieDto>> GetMovie(int id, bool includeActors = false)
         {
             return Ok(await _serviceManager.Movies.GetMovieAsync(id, includeActors));
         }
